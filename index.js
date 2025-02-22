@@ -9,12 +9,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/", function (req, res) {
-  fs.readdir("./files", function (err, files) {
+  fs.readdir("./files/", function (err, files) {
     console.log(files);
     res.render("index", { files: files });
   });
 });
-
 app.get("/files/:filename", function (req, res) {
   fs.readFile(
     `./files/${req.params.filename}`,
@@ -28,6 +27,19 @@ app.get("/files/:filename", function (req, res) {
   );
 });
 
+app.get("/edit/:filename", function (req, res) {
+  res.render("edit", { filename: req.params.filename });
+});
+
+app.post("/edit", function (req, res) {
+  fs.rename(
+    `./files/${req.body.previous}`,
+    `./files/${req.body.new}`,
+    function (err) {
+      res.redirect("/");
+    }
+  );
+});
 app.post("/create", function (req, res) {
   fs.writeFile(
     `./files/${req.body.title.split(" ").join("")}.txt`,
